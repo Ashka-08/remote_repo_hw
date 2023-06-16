@@ -13,4 +13,8 @@ public class View {
             return data;
         }
     }
+
+    public void output(String str) {
+        System.out.println(str);
+    }
 }
