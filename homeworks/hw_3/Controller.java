@@ -27,9 +27,8 @@ public class Controller {
                 try (FileWriter writer = new FileWriter(file, true)) {
                     writer.write(user.toString());
                     view.output("Файл записан успешно"); 
-                } catch (RuntimeException | IOException e) {
-                    view.output("cath exception: " +
-                                e.getClass().getSimpleName());
+                } catch (IOException e) {
+                    view.output(e.getStackTrace().toString());
                 }  
             } else {
                 System.out.println("Юзер не спарсен");
