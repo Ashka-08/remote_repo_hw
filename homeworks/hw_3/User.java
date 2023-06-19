@@ -1,155 +1,110 @@
 package homeworks.hw_3;
-/* Форматы данных:
-* фамилия, имя, отчество - строки
-* дата рождения - строка формата dd.mm.yyyy
-* номер телефона - целое беззнаковое число без форматирования
-* пол - символ латиницей f или m. */
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 
-import homeworks.hw_3.MyExcteptions.MyDateException;
-import homeworks.hw_3.MyExcteptions.MyGenderException;
+import homeworks.hw_3.MyExceptions.MyDateException;
+import homeworks.hw_3.MyExceptions.MyGenderException;
+import homeworks.hw_3.MyExceptions.MyLanguageException;
+import homeworks.hw_3.MyExceptions.MyNameException;
+import homeworks.hw_3.MyExceptions.MyPhoneExcteption;
+
+import java.text.SimpleDateFormat;
 
 public class User {
-    public HashMap<String, Object> dataUser;
+    public List<String> dataArrUser;
+
+    public User(List<String> dataArrUser) {
+        this.dataArrUser = dataArrUser;
+    }
+
+    public User() {
+        this.dataArrUser = new ArrayList<>();
+    }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (String str : dataUser.keySet()) {
-            sb.append(dataUser.get(str));
-            sb.append(" ");
+        for (String string : dataArrUser) {
+            sb.append(string + " ");
         }
+        sb.append("\n");
         return sb.toString();
     }
-    public int checkSize(String inputData) {
-        String[] data = parseArray(inputData);
-        if (data.length == 6) {
-            return 0;
-        } else if (data.length < 6) {
-            return -1;
-        } else {
-            return -2;
-        }
-    }
 
-    private String[] parseArray(String inputData) {
-        return inputData.split(" ");
-    }
+    public List<String> parser(String[] data) 
+            throws MyDateException, MyGenderException, MyNameException, 
+            MyPhoneExcteption, MyLanguageException {
 
-    public HashMap<String, Object> createUser(String inputData) {
-        return parseData(parseArray(inputData));
-    }
+        List<String> dataArrUser = new ArrayList<>();
+        for (int i = 0; i < data.length; i++) {
 
-    private HashMap<String, Object> parseData(String[] data) {
-        HashMap<String, Object> dataUser = new HashMap<>();
-        StringBuilder sb = new StringBuilder();
-
-        for (String i : data) {
+            if (i >= 0 && i < 3) {
+                if (data[i].matches("[а-яёА-ЯЁ]+")) {
+                    dataArrUser.add(data[i]);
+                } else if (data[i].matches("[A-Za-z]+")) {
+                    throw new MyLanguageException();
+                } else {
+                    throw new MyNameException();
+                }
+            }
             
-            if (i.length() == 1) {
-                if (i.equalsIgnoreCase("f") || 
-                    i.equalsIgnoreCase("m")) {
-                    dataUser.put("Gender", i);
-                } else {
-                    try {
-                        throw new MyGenderException();
-                    } catch (MyGenderException e) {
-                        e.myGenderExceptionDesc(i);
-                    }
-                }
-            } else if (i.matches("\\d{1,2}\\.\\d{1,2}\\.\\d{4}")) {
-                String[] arrayDate = i.split("\\.");
-                boolean flag = true;
-                if (Integer.parseInt(arrayDate[0]) < 0 ||
-                    Integer.parseInt(arrayDate[0]) > 31 || 
-                    Integer.parseInt(arrayDate[1]) < 0 ||
-                    Integer.parseInt(arrayDate[1]) > 12 || 
-                    Integer.parseInt(arrayDate[2]) < 0 ||
-                    Integer.parseInt(arrayDate[1]) > 2022) {
-                    try {
-                        throw new MyDateException();
-                    } catch (MyDateException e) {
-                        e.myDateExceptionDesc(i);
-                    }
-                } else {
-                    if (Integer.parseInt(arrayDate[2]) % 4 == 0) {
-                        if (Integer.parseInt(arrayDate[1]) == 1 ||
-                                Integer.parseInt(arrayDate[1]) == 3 ||
-                                Integer.parseInt(arrayDate[1]) == 5 ||
-                                Integer.parseInt(arrayDate[1]) == 7 ||
-                                Integer.parseInt(arrayDate[1]) == 9 ||
-                                Integer.parseInt(arrayDate[1]) == 10 ||
-                                Integer.parseInt(arrayDate[1]) == 12) {
-                            if (Integer.parseInt(arrayDate[0]) < 32) {
-                                flag = false;
-                            }
-                        } else if (Integer.parseInt(arrayDate[1]) == 2) {
-                            if (Integer.parseInt(arrayDate[0]) < 30) {
-                                flag = false;
-                            }
-                        } else if (Integer.parseInt(arrayDate[1]) == 4 ||
-                                Integer.parseInt(arrayDate[1]) == 6 ||
-                                Integer.parseInt(arrayDate[1]) == 8 ||
-                                Integer.parseInt(arrayDate[1]) == 11) {
-                            if (Integer.parseInt(arrayDate[0]) < 31) {
-                                flag = false;
-                            }
-                        }
-                    } else {
-                        if (Integer.parseInt(arrayDate[1]) == 1 ||
-                                Integer.parseInt(arrayDate[1]) == 3 ||
-                                Integer.parseInt(arrayDate[1]) == 5 ||
-                                Integer.parseInt(arrayDate[1]) == 7 ||
-                                Integer.parseInt(arrayDate[1]) == 9 ||
-                                Integer.parseInt(arrayDate[1]) == 10 ||
-                                Integer.parseInt(arrayDate[1]) == 12) {
-                            if (Integer.parseInt(arrayDate[0]) < 32) {
-                                flag = false;
-                            }
-                        } else if (Integer.parseInt(arrayDate[2]) == 2) {
-                            if (Integer.parseInt(arrayDate[0]) < 29) {
-                                flag = false;
-                            }
-                        } else if (Integer.parseInt(arrayDate[1]) == 4 ||
-                                Integer.parseInt(arrayDate[1]) == 6 ||
-                                Integer.parseInt(arrayDate[1]) == 8 ||
-                                Integer.parseInt(arrayDate[1]) == 11) {
-                            if (Integer.parseInt(arrayDate[0]) < 31) {
-                                flag = false;
-                            }
-                        }
-
-                    }
-                    if (!flag) {
-                        dataUser.put("Date", i);
-                    } else try {
-                        throw new MyDateException();
-                    } catch (MyDateException e) {
-                        e.myDateExceptionDesc(i);
-                    }
-                }
-
-            } else if (i.matches("[0-9]+")) {
-                dataUser.put("tel", i);
-            } else if (i.matches("[A-Za-z]+")) {
-                sb.append(i + " ");
-            } else {
+            if (i == 3) {
                 try {
+                    SimpleDateFormat date = new SimpleDateFormat("dd.MM.yyyy");
+                    dataArrUser.add(date.format(date.parse(data[i])).toString());
+                } catch (Exception e) {
                     throw new MyDateException();
-                } catch (MyDateException e) {
-                    e.myDateExceptionDesc(i);
+                }
+            } 
+            if (i == 4) {
+                try {
+                    if (data[i].length() !=11) {
+                        throw new MyPhoneExcteption();
+                    }
+                    dataArrUser.add(String.valueOf(Long.parseLong(data[i])));
+                } catch (Exception e) {
+                    throw new MyPhoneExcteption();
+                }
+            }
+            if (i == 5) {
+                try {
+                    if (data[i].equalsIgnoreCase("f") || 
+                        data[i].equalsIgnoreCase("m")) {
+                        dataArrUser.add(data[i]);
+                    } 
+                } catch (Exception e) {
+                    throw new MyGenderException();
                 }
             }
         }
-        String[] fullName = String.valueOf(sb).split(" ");
-        if (fullName.length == 3) {
-            dataUser.put("firstName", fullName[1]);
-            dataUser.put("lastName", fullName[0]);
-            dataUser.put("middleName", fullName[2]);
+        if (dataArrUser.size() < 6) {
+            throw new RuntimeException("Где-то закралась ошибка при парсинге данных");
         }
-        
-        return dataUser;
+        return dataArrUser;
     }
-    
+
+    public List<String> getDataArrUser() {
+        return dataArrUser;
+    }
+
+    public void setDataArrUser(List<String> dataArrUser) {
+        this.dataArrUser = dataArrUser;
+    }
+
+    public String getLastName() {
+        if (arayDataOk()) {
+            return dataArrUser.get(0);
+        }
+        return "not LastName";
+        
+    }
+
+    public Boolean arayDataOk() {
+        if (dataArrUser.size() != 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
